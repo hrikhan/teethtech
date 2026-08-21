@@ -1,4 +1,4 @@
-# 🎉 Welcome to bloc_template!
+# 🎉 Welcome to teethtech!
 
 This project was generated dynamically based on your specific requirements. Before running your app for the first time, follow this brief setup guide to configure the required environment variables, permissions, and dependencies locally.
 
@@ -21,7 +21,7 @@ com.yourcompany.my_app
 After that, replace the template package name everywhere:
 
 ```bash
-perl -pi -e 's/bloc_template/my_app/g' $(find lib test -name "*.dart") pubspec.yaml README.md AGENTS.md DESIGN.md SETUP.md
+perl -pi -e 's/teethtech/my_app/g' $(find lib test -name "*.dart") pubspec.yaml README.md AGENTS.md DESIGN.md SETUP.md
 ```
 
 Then update the app title, `.env`, splash, icons, and platform-specific settings.

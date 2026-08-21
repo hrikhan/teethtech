@@ -1,21 +1,19 @@
-import 'package:bloc_template/src/imports/core_imports.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:teethtech/src/imports/core_imports.dart';
 
 class App extends StatelessWidget {
   const App({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final current = _buildMaterialApp(context);
-    return current;
-  }
+    final themeMode = context.watch<ThemeCubit>().state;
 
-  Widget _buildMaterialApp(BuildContext context) {
     return MaterialApp.router(
-      title: 'bloc_template',
+      title: 'TeethTech',
       debugShowCheckedModeBanner: false,
-      theme: buildLightTheme(primaryColorHex: '#2e00ad'),
-      darkTheme: buildDarkTheme(primaryColorHex: '#2e00ad'),
-      themeMode: ThemeMode.system,
+      theme: buildLightTheme(),
+      darkTheme: buildDarkTheme(),
+      themeMode: themeMode,
       routerConfig: appRouter,
       localizationsDelegates: context.localizationDelegates,
       supportedLocales: context.supportedLocales,

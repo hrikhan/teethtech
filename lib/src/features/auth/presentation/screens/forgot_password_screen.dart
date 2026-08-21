@@ -1,7 +1,7 @@
-import 'package:bloc_template/src/imports/core_imports.dart';
-import 'package:bloc_template/src/imports/packages_imports.dart';
+import 'package:teethtech/src/imports/core_imports.dart';
+import 'package:teethtech/src/imports/packages_imports.dart';
 
-import 'package:bloc_template/src/features/auth/presentation/providers/auth_bloc.dart';
+import 'package:teethtech/src/features/auth/presentation/providers/auth_bloc.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({super.key});

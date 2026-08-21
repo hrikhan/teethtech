@@ -1,8 +1,6 @@
-import 'package:bloc_template/src/imports/core_imports.dart';
-import 'package:bloc_template/src/imports/packages_imports.dart';
-
-import 'package:bloc_template/src/features/auth/presentation/providers/session_bloc.dart';
-
+import 'package:teethtech/src/imports/core_imports.dart';
+import 'package:teethtech/src/imports/packages_imports.dart';
+import 'package:teethtech/src/features/auth/presentation/providers/session_bloc.dart';
 
 class SessionListenerWrapper extends StatelessWidget {
   final Widget child;
@@ -17,8 +15,6 @@ class SessionListenerWrapper extends StatelessWidget {
           FlutterNativeSplash.remove();
           if (state.status == SessionStatus.authenticated) {
             context.go(AppRoutes.home);
-          } else if (state.status == SessionStatus.unauthenticated) {
-            context.go(AppRoutes.onboarding);
           }
         }
       },

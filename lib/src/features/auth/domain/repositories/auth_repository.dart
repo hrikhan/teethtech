@@ -1,5 +1,5 @@
-import 'package:bloc_template/src/utils/utils.dart';
-import 'package:bloc_template/src/features/auth/domain/entities/user.dart';
+import 'package:teethtech/src/utils/utils.dart';
+import 'package:teethtech/src/features/auth/domain/entities/user.dart';
 
 abstract class AuthRepository {
   /// Stream of auth state changes. Emits AppUser when authenticated, null when not.

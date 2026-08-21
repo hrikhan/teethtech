@@ -1,7 +1,7 @@
 import 'dart:async';
-import 'package:bloc_template/src/imports/imports.dart';
-import 'package:bloc_template/src/features/auth/domain/entities/user.dart';
-import 'package:bloc_template/src/features/auth/domain/repositories/auth_repository.dart';
+import 'package:teethtech/src/imports/imports.dart';
+import 'package:teethtech/src/features/auth/domain/entities/user.dart';
+import 'package:teethtech/src/features/auth/domain/repositories/auth_repository.dart';
 
 /// Session events
 abstract class SessionEvent extends Equatable {

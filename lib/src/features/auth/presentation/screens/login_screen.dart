@@ -1,7 +1,11 @@
-import 'package:bloc_template/src/imports/core_imports.dart';
-import 'package:bloc_template/src/imports/packages_imports.dart';
-
-import 'package:bloc_template/src/features/auth/presentation/providers/auth_bloc.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
+import '../../../../extensions/context_extension.dart';
+import '../../../../routing/app_routes.dart';
+import '../../../../shared/app_assets.dart';
+import '../../../../shared/widgets/app_text_field.dart';
+import '../providers/auth_bloc.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -23,253 +27,401 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
+  void _handleLogin({String? email, String? password}) {
+    if (email != null && password != null) {
+      _emailController.text = email;
+      _passwordController.text = password;
+    } else {
+      if (!(_formKey.currentState?.validate() ?? false)) return;
+    }
+
+    context.read<AuthBloc>().add(
+          LoginRequested(
+            context: context,
+            email: _emailController.text.trim(),
+            password: _passwordController.text.trim(),
+          ),
+        );
+  }
+
+  void _loginAsB2BClinic() {
+    _handleLogin(
+      email: 'clinic.apex@teethtech.com',
+      password: 'password123',
+    );
+  }
+
+  void _loginAsB2CCustomer() {
+    _handleLogin(
+      email: 'dr.tanvir@teethtech.com',
+      password: 'password123',
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final isLoading = context.select((AuthBloc bloc) => bloc.state.isLoading);
-
     final cs = context.theme.colorScheme;
     final tt = context.theme.textTheme;
+    final isDark = context.theme.brightness == Brightness.dark;
 
-    Future<void> handleLogin() async {
-      if (!(_formKey.currentState?.validate() ?? false)) return;
-      
-
-      context.read<AuthBloc>().add(
-        LoginRequested(
-          context: context, 
-          email: _emailController.text, 
-          password: _passwordController.text,
-        ),
-      );
-    }
-
-    return _LoginView(
-      formKey: _formKey,
-      emailController: _emailController,
-      passwordController: _passwordController,
-      obscurePassword: _obscurePassword,
-      isLoading: isLoading,
-      onToggleObscure: () => setState(() => _obscurePassword = !_obscurePassword),
-      onLogin: handleLogin,
-      cs: cs,
-      tt: tt,
-    );
-  }
-}
-
-class _LoginView extends StatelessWidget {
-  const _LoginView({
-    required this.formKey,
-    required this.emailController,
-    required this.passwordController,
-    required this.obscurePassword,
-    required this.isLoading,
-    required this.onToggleObscure,
-    required this.onLogin,
-    required this.cs,
-    required this.tt,
-  });
-
-  final GlobalKey<FormState> formKey;
-  final TextEditingController emailController;
-  final TextEditingController passwordController;
-  final bool obscurePassword;
-  final bool isLoading;
-  final VoidCallback onToggleObscure;
-  final VoidCallback onLogin;
-  final ColorScheme cs;
-  final TextTheme tt;
-
-  @override
-  Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: cs.surface,
+      appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_rounded),
+          onPressed: () => context.pop(),
+        ),
+      ),
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
-            padding: EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                SizedBox(height: AppSpacing.xl),
-                Text(
-                  'auth.log_in'.tr(),
-                  style: tt.headlineMedium?.copyWith(fontWeight: FontWeight.bold),
+                // Official TeethTech Logo
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 32),
+                  child: Image.asset(
+                    AppAssets.logo,
+                    height: 52,
+                    fit: BoxFit.contain,
+                    errorBuilder: (context, error, stackTrace) => Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: cs.primary,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: const Icon(
+                            Icons.medical_services_rounded,
+                            color: Colors.white,
+                            size: 26,
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        Text(
+                          'TeethTech',
+                          style: tt.headlineSmall?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: cs.primary,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
-                SizedBox(height: AppSpacing.sm),
+                const SizedBox(height: 18),
+
                 Text(
-                  'auth.log_in_subtitle'.tr(),
+                  'Welcome Back Doctor',
+                  style: tt.headlineSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: -0.3,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  'Sign in to access clinical pricing, orders, and warranty',
                   textAlign: TextAlign.center,
-                  style: tt.bodyMedium?.copyWith(color: cs.onSurfaceVariant),
+                  style: tt.bodyMedium?.copyWith(
+                    color: cs.onSurfaceVariant,
+                  ),
                 ),
-                SizedBox(height: AppSpacing.xxxl),
+                const SizedBox(height: 24),
+
                 // Form Card
                 Form(
-                  key: formKey,
+                  key: _formKey,
                   child: Column(
                     children: [
                       AppTextField(
-                        controller: emailController,
+                        controller: _emailController,
                         enabled: !isLoading,
-                        label: 'auth.email'.tr(),
-                        prefixIcon: const Icon(IconsaxPlusBold.sms),
+                        label: 'Email or BMDC Reg #',
+                        prefixIcon: const Icon(Icons.email_outlined),
                         validator: (v) {
-                          if (AppUtils.isBlank(v)) {
-                            return 'auth.email_required'.tr();
-                          }
-                          if (!AppUtils.isValidEmail(v!)) {
-                            return 'auth.email_invalid'.tr();
+                          if (v == null || v.trim().isEmpty) {
+                            return 'Please enter your email or BMDC ID';
                           }
                           return null;
                         },
                       ),
-                      SizedBox(height: AppSpacing.md),
+                      const SizedBox(height: 14),
                       AppTextField(
-                        controller: passwordController,
+                        controller: _passwordController,
                         enabled: !isLoading,
-                        label: 'auth.password'.tr(),
-                        obscureText: obscurePassword,
-                        prefixIcon: const Icon(IconsaxPlusBold.lock),
+                        label: 'Password',
+                        obscureText: _obscurePassword,
+                        prefixIcon: const Icon(Icons.lock_outline_rounded),
                         suffixIcon: IconButton(
-                          icon: Icon(obscurePassword ? Icons.visibility_off : Icons.visibility),
-                          onPressed: onToggleObscure,
+                          icon: Icon(_obscurePassword
+                              ? Icons.visibility_off_outlined
+                              : Icons.visibility_outlined),
+                          onPressed: () => setState(
+                              () => _obscurePassword = !_obscurePassword),
                         ),
-                         validator: (v) {
-                          if (AppUtils.isBlank(v)) {
-                            return 'auth.password_required'.tr();
-                          }
-                          if (v!.length < 6) {
-                            return 'auth.password_too_short'.tr();
+                        validator: (v) {
+                          if (v == null || v.trim().length < 6) {
+                            return 'Password must be at least 6 characters';
                           }
                           return null;
                         },
                       ),
-                      SizedBox(height: AppSpacing.sm),
+                      const SizedBox(height: 10),
                       Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        mainAxisAlignment: MainAxisAlignment.end,
                         children: [
-                          Row(
-                            spacing: 5,
-                            children: [
-                              SizedBox(
-                                width: 20,
-                                height: 20,
-                                child: Checkbox(
-                                  value: true,
-                                  onChanged: (value) {},
-                                ),
-                              ),
-                              Text(
-                                'auth.remember_me'.tr(),
-                                style: tt.bodySmall?.copyWith(color: cs.onSurfaceVariant),
-                              ),
-                            ],
-                          ),
                           TextButton(
                             style: TextButton.styleFrom(
                               padding: EdgeInsets.zero,
+                              visualDensity: VisualDensity.compact,
                             ),
                             onPressed: () {
                               context.push(AppRoutes.forgotPassword);
                             },
                             child: Text(
-                              'auth.forgot_password'.tr(),
+                              'Forgot Password?',
                               style: tt.bodySmall?.copyWith(
-                                color: cs.onSurfaceVariant,
+                                color: cs.primary,
+                                fontWeight: FontWeight.bold,
                               ),
                             ),
                           ),
                         ],
                       ),
-                      SizedBox(height: AppSpacing.lg),
-                      AppButton(
-                        label: 'Sign In',
-                        isLoading: isLoading,
-                        onPressed: isLoading ? null : onLogin,
-                        width: ButtonSize.large,
-                        isFullWidth: false,
+                      const SizedBox(height: 16),
+
+                      // Sign In Button (Text ALWAYS Pure White)
+                      SizedBox(
+                        width: double.infinity,
+                        height: 52,
+                        child: ElevatedButton(
+                          onPressed: isLoading ? null : () => _handleLogin(),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: cs.primary,
+                            foregroundColor: Colors.white,
+                            elevation: 2,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(14),
+                            ),
+                          ),
+                          child: isLoading
+                              ? const SizedBox(
+                                  width: 22,
+                                  height: 22,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2.2,
+                                    color: Colors.white,
+                                  ),
+                                )
+                              : const Text(
+                                  'Sign In to Account',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 15,
+                                  ),
+                                ),
+                        ),
                       ),
                     ],
                   ),
                 ),
-                SizedBox(height: AppSpacing.xxxl),
-                Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      spacing: 20,
-                      children: [
-                        SizedBox(
-                          width: 50,
-                          height: 50,
-                          child: TextButton(
-                            onPressed: () {},
-                            style: TextButton.styleFrom(
-                              backgroundColor: const Color(0xFFEA4335).withValues(alpha: 0.8),
-                              padding: const EdgeInsets.symmetric(horizontal: 10),
-                              shape: const RoundedRectangleBorder(
-                                borderRadius: AppBorders.button,
-                              ),
-                            ),
-                            child: SvgPicture.asset(AppAssets.googleIcon),
-                          ),
-                        ),
-                        SizedBox(
-                          width: 50,
-                          height: 50,
-                          child: TextButton(
-                            onPressed: () {},
-                            style: TextButton.styleFrom(
-                              backgroundColor: const Color(0xFF4285F4),
-                              padding: const EdgeInsets.symmetric(horizontal: 10),
-                              shape: const RoundedRectangleBorder(
-                                borderRadius: AppBorders.button,
-                              ),
-                            ),
-                            child: SvgPicture.asset(AppAssets.facebookIcon),
-                          ),
-                        ),
-                        SizedBox(
-                          width: 50,
-                          height: 50,
-                          child: TextButton(
-                            onPressed: () {},
-                            style: TextButton.styleFrom(
-                              backgroundColor: const Color(0xFF000000),
-                              padding: const EdgeInsets.symmetric(horizontal: 10),
-                              shape: const RoundedRectangleBorder(
-                                borderRadius: AppBorders.button,
-                              ),
-                            ),
-                            child: SvgPicture.asset(AppAssets.appleIcon),
-                          ),
-                        ),
-                      ],
+
+                const SizedBox(height: 24),
+
+                // ⚡ 1-Tap Demo Logins Section
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: isDark
+                        ? const Color(0xFF131D2A)
+                        : const Color(0xFFF1F5F9),
+                    borderRadius: BorderRadius.circular(18),
+                    border: Border.all(
+                      color: cs.outlineVariant.withValues(alpha: 0.6),
                     ),
-                    SizedBox(height: AppSpacing.xl),
-                  ],
-                ),
-                InkWell(
-                  onTap: () {
-                    context.push(AppRoutes.signup);
-                  },
-                  child: RichText(
-                    text: TextSpan(
-                      text: 'auth.dont_have_account'.tr(),
-                      style: tt.bodyMedium?.copyWith(color: cs.onSurfaceVariant),
-                      children: [
-                        TextSpan(
-                          text: 'auth.sign_up'.tr(),
-                          style: TextStyle(
-                            color: cs.primary,
-                            fontWeight: FontWeight.bold,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          const Icon(Icons.bolt_rounded,
+                              color: Color(0xFFD97706), size: 18),
+                          const SizedBox(width: 6),
+                          Text(
+                            'QUICK 1-TAP DEMO LOGIN',
+                            style: tt.labelSmall?.copyWith(
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: 0.8,
+                              color: const Color(0xFFD97706),
+                              fontSize: 10.5,
+                            ),
                           ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+
+                      // Demo 1: B2B Dental Clinic
+                      _buildDemoLoginTile(
+                        context: context,
+                        icon: Icons.local_hospital_rounded,
+                        title: 'Demo: B2B Dental Clinic',
+                        subtitle: 'Apex Dental Care (Wholesale & VAT Tier)',
+                        badge: 'B2B TIER',
+                        badgeColor: cs.primary,
+                        onTap: isLoading ? null : _loginAsB2BClinic,
+                      ),
+                      const SizedBox(height: 10),
+
+                      // Demo 2: Single Customer (B2C)
+                      _buildDemoLoginTile(
+                        context: context,
+                        icon: Icons.person_outline_rounded,
+                        title: 'Demo: Retail Customer (B2C)',
+                        subtitle: 'Dr. Tanvir Ahmed (Single item orders)',
+                        badge: 'RETAIL B2C',
+                        badgeColor: const Color(0xFF00897B),
+                        onTap: isLoading ? null : _loginAsB2CCustomer,
+                      ),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 24),
+
+                // Create Account Link
+                InkWell(
+                  onTap: () => context.push(AppRoutes.signup),
+                  borderRadius: BorderRadius.circular(8),
+                  child: Padding(
+                    padding: const EdgeInsets.all(8),
+                    child: RichText(
+                      text: TextSpan(
+                        text: "Don't have a dental account? ",
+                        style: tt.bodyMedium?.copyWith(
+                          color: cs.onSurfaceVariant,
                         ),
-                      ],
+                        children: [
+                          TextSpan(
+                            text: 'Sign Up',
+                            style: TextStyle(
+                              color: cs.primary,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
+                const SizedBox(height: 16),
               ],
             ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDemoLoginTile({
+    required BuildContext context,
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required String badge,
+    required Color badgeColor,
+    required VoidCallback? onTap,
+  }) {
+    final cs = context.theme.colorScheme;
+    final isDark = context.theme.brightness == Brightness.dark;
+
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          decoration: BoxDecoration(
+            color: isDark ? cs.surface : Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: cs.outlineVariant.withValues(alpha: 0.5),
+            ),
+          ),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: badgeColor.withValues(alpha: 0.12),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(icon, color: badgeColor, size: 20),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Flexible(
+                          child: Text(
+                            title,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 12.5,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        const SizedBox(width: 6),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 6, vertical: 1.5),
+                          decoration: BoxDecoration(
+                            color: badgeColor.withValues(alpha: 0.15),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: Text(
+                            badge,
+                            style: TextStyle(
+                              color: badgeColor,
+                              fontSize: 8.5,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      subtitle,
+                      style: TextStyle(
+                        fontSize: 10.5,
+                        color: cs.onSurfaceVariant,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 6),
+              Icon(
+                Icons.arrow_forward_ios_rounded,
+                size: 12,
+                color: cs.onSurfaceVariant,
+              ),
+            ],
           ),
         ),
       ),

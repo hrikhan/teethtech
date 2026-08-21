@@ -7,6 +7,10 @@ class AppConfig {
   static late final Dio dio;
 
   static String get baseUrl => _getBaseUrl();
+  static bool get useMockApi {
+    if (!dotenv.isInitialized) return true;
+    return dotenv.get('USE_MOCK_API', fallback: 'true').toLowerCase() == 'true';
+  }
 
   static Future<void> init() async {
     dio = Dio(
@@ -37,10 +41,10 @@ class AppConfig {
         },
       ),
     );
-
   }
 
   static String _getBaseUrl() {
+    if (!dotenv.isInitialized) return 'https://api.example.com';
     return dotenv.get('API_BASE_URL', fallback: 'https://api.example.com');
   }
 }

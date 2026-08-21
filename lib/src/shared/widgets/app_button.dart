@@ -72,12 +72,12 @@ class AppButton extends StatelessWidget {
     };
 
     final (bg, fg, border) = switch (variant) {
-      ButtonVariant.primary   => (color ?? cs.primary, color ?? cs.onPrimary, null),
+      ButtonVariant.primary   => (color ?? cs.primary, Colors.white, null),
       ButtonVariant.secondary => (cs.secondaryContainer, cs.onSecondaryContainer, null),
       ButtonVariant.outline   => (Colors.transparent, cs.primary, BorderSide(color: cs.outline, width: 1.5)),
       ButtonVariant.ghost     => (Colors.transparent, cs.primary, null),
-      ButtonVariant.danger    => (cs.error, cs.onError, null),
-      ButtonVariant.success   => (appColors.success, appColors.onSuccess, null),
+      ButtonVariant.danger    => (cs.error, Colors.white, null),
+      ButtonVariant.success   => (appColors.success, Colors.white, null),
     };
 
     final child = AnimatedSwitcher(

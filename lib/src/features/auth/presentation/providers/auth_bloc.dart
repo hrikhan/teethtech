@@ -1,7 +1,7 @@
-import 'package:bloc_template/src/imports/core_imports.dart';
-import 'package:bloc_template/src/imports/packages_imports.dart';
+import 'package:teethtech/src/imports/core_imports.dart';
+import 'package:teethtech/src/imports/packages_imports.dart';
 
-import 'package:bloc_template/src/features/auth/domain/repositories/auth_repository.dart';
+import 'package:teethtech/src/features/auth/domain/repositories/auth_repository.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final AuthRepository _repository;

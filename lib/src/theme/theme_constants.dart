@@ -18,3 +18,4 @@ export 'app_curves.dart';
 export 'color_schemes.dart';
 export 'text_theme.dart';
 export 'theme.dart';
+export 'theme_cubit.dart';
