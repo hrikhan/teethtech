@@ -17,7 +17,6 @@ migrate_working_dir/
 .idea/
 
 # Visual Studio Code related
-.vscode/
 
 # Flutter / Dart specific
 .dart_tool/
@@ -63,3 +62,4 @@ branch_structure.json
 temp_auto_push.bat
 temp_interactive_push.bat
 *.bat
+.gitignore
